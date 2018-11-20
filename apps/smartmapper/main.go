@@ -50,8 +50,18 @@ func appBuilder() *flogo.App {
 	trg := app.NewTrigger(&rt.RestTrigger{}, map[string]interface{}{"port": port})
 	// trg.NewFuncHandler(map[string]interface{}{"method": "GET", "path": "/api/invoices/:id"}, handler)
 	trg.NewFuncHandler(map[string]interface{}{"method": "POST", "path": "/api"}, handler)
+	trg.NewFuncHandler(map[string]interface{}{"method": "GET", "path": "/health"}, health)
 
 	return app
+}
+
+func health(ctx context.Context, inputs map[string]*data.Attribute) (map[string]*data.Attribute, error) {
+	response := make(map[string]interface{})
+	response["status"] =  "ok"
+	ret := make(map[string]*data.Attribute)
+	ret["code"], _ = data.NewAttribute("code", data.TypeInteger, 200)
+	ret["data"], _ = data.NewAttribute("data", data.TypeAny, response)
+	return ret, nil
 }
 
 func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string]*data.Attribute, error) {
